@@ -159,3 +159,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+ # TODO
+ # Add optional location override
+ # Fix issue with empty tags getting copied over from title   
