@@ -27,7 +27,6 @@ date: 2016-05-05
 ---
 """
 
-# Import Statements
 import argparse
 import datetime
 import subprocess
@@ -40,18 +39,21 @@ DEFAULT_EXT = 'md'
 
 def main():
     # parse the arguments
-    parser = argparse.ArgumentParser(description='Create a new Jekyll post.')
+    parser = argparse.ArgumentParser(description='Create a new Jekyll post template')
     parser.add_argument('title', help='the title of the post wrapped in quotes.')
     parser.add_argument('-d', '--date', help='specify the post date in the format YYYY-MM-DD, otherwise today is the default date.')
     parser.add_argument('-n', '--name', help='specify the name of the post file instead of the automatically generated one. It is a best practice for the words to be separated by hyphens. Also note that the given name will be prepended with the date so as to conform to Jekyll naming requirements.')
     parser.add_argument('-t', '--tags', help='specify a set of tags for the post separated by spaces with the entire set wrapped in quotes (e.g. "tag1 tag2 tag3").')
-    parser.add_argument('-c', '--category', help='specify a category. notes, longform or reading.')
+    parser.add_argument('-c', '--category', help='specify a category. notes, longform, or reading.')
+    parser.add_argument('-l', '--location', help='specify a location. Otherwise a location will be read from your IP address.')
     parser.add_argument('-w', '--write', action="store_true",
         help='signals if this file should be opened for writing after creation')
     args = parser.parse_args()
 
     title = args.title
     # exchange spaces for dashes
+    # Use title if a name isn't specified
+    # ---------------------------------------
     dash_title = ''
     if args.name:
         dash_title = args.name.replace(' ','-')
@@ -59,6 +61,7 @@ def main():
         dash_title = title.replace(' ','-')
 
     # clean up any special characters from the dash-title
+    # ---------------------------------------
     temp_title = '';
     for char in dash_title:
         if char.isalnum() or char == '-':
@@ -67,7 +70,7 @@ def main():
 
     # Adding a date to the post
     # Perhaps the most annoying bit of Jekyll
-    # -------------------------
+    # ---------------------------------------
     date = None
     if args.date:
         date = args.date
@@ -85,7 +88,6 @@ def main():
         #day = today.day > 9 ? str(today.day) : '0' + str(today.day)
         date = "-".join([year,month,day])
 
-    #filename = '%s-%s.%s', date, title, DEFAULT_EXT
     filename = date + '-' + dash_title + '.' + DEFAULT_EXT
 
     # With the right category, move it to the correct location
@@ -118,7 +120,7 @@ def main():
         tags = args.tags.split(' ')
 
     # Add location
-    # I like to add a location to my posts as location, state
+    # I like to add a location to my posts as "city, state"
     # ---------------------------------------------------------    
     z = rq.get("http://ipinfo.io")
     x = json.loads(z.text)
@@ -159,8 +161,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
- # TODO
- # Add optional location override
- # Fix issue with empty tags getting copied over from title   
